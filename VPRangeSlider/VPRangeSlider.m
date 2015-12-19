@@ -21,10 +21,6 @@
 // The foregroundView represent selected/inside range view
 @property (nonatomic, strong) UIView *sliderForegroundView;
 
-// Represent current range selector index points
-@property (nonatomic, assign) NSInteger startSegmentIndex;
-@property (nonatomic, assign) NSInteger endSegmentIndex;
-
 // Represent the range slider on either side of the slider
 @property (nonatomic, strong) UIButton *startSliderButton;
 @property (nonatomic, strong) UIButton *endSliderButton;
@@ -121,8 +117,6 @@
     _numberOfSegments = numberOfSegments;
     
     // After setting the numberOfSegments, set all the necessary views
-    self.startSegmentIndex = 1;
-    self.endSegmentIndex = _numberOfSegments;
     self.segmentWidth = [self getSegmentWidthForSegmentCount:_numberOfSegments];
     
     if (self.requireSegments)
@@ -232,6 +226,12 @@
     }
     else if (panGesture.state == UIGestureRecognizerStateEnded || panGesture.state == UIGestureRecognizerStateFailed || panGesture.state == UIGestureRecognizerStateCancelled)
     {
+        if (self.requireSegments)
+        {
+            // Move the slider to nearest segment
+            [self moveSliderToNearestSegmentWithEndingPoint:point];
+        }
+        
         [self resetSelectedStateForSlidingButtons];
     }
 }
@@ -296,6 +296,13 @@
     }
 }
 
+// Slide to nearest position
+- (void)moveSliderToNearestSegmentWithEndingPoint:(CGPoint)point
+{
+    NSInteger nearestSegmentIndex = round((point.x - SLIDER_BUTTON_WIDTH / 2) / self.segmentWidth);
+    [self sliderDidSlideForPoint:CGPointMake(SLIDER_BUTTON_WIDTH/2 + nearestSegmentIndex * self.segmentWidth, point.y)];
+}
+
 - (BOOL)shouldStartButtonSlideForPoint:(CGPoint)point
 {
     CGFloat endButtonMidPoint = CGRectGetMidX(self.endSliderButton.frame);
@@ -308,7 +315,7 @@
         endButtonMidPoint -= self.sliderSepertorWidth;
     }
     
-    return (point.x < endButtonMidPoint && point.x >= SLIDER_BUTTON_WIDTH/2);
+    return (round(point.x) <= round(endButtonMidPoint) && point.x >= SLIDER_BUTTON_WIDTH/2);
 }
 
 - (BOOL)shouldEndButtonSlideForPoint:(CGPoint)point
@@ -319,7 +326,7 @@
         startButtonMidPoint += self.segmentWidth;
     }
     
-    return (point.x > startButtonMidPoint && point.x <= self.frame.size.width - SLIDER_BUTTON_WIDTH/2);
+    return (round(point.x) >= round(startButtonMidPoint) && point.x <= self.frame.size.width - SLIDER_BUTTON_WIDTH/2);
 }
 
 #pragma mark - Calculation for slider frame

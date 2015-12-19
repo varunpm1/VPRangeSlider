@@ -88,16 +88,23 @@
             self.sliderBackgroundView.frame = DEFAULT_SLIDER_FRAME;
             self.sliderForegroundView.frame = DEFAULT_SLIDER_FRAME;
             
+            self.sliderBackgroundView.backgroundColor = self.rangeSliderBackgroundColor;
+            self.sliderForegroundView.backgroundColor = self.rangeSliderForegroundColor;
+            
             self.segmentWidth = [self getSegmentWidthForSegmentCount:self.numberOfSegments];
             
             self.startSliderButton.center = CGPointMake(SLIDER_BUTTON_WIDTH/2, CGRectGetMidY(self.sliderBackgroundView.frame));
             self.endSliderButton.center = [self getSegmentCenterPointForSegmentIndex:self.numberOfSegments];
+            
+            [self setImageForSegmentOrSliderButton:self.startSliderButton isSlider:YES];
+            [self setImageForSegmentOrSliderButton:self.endSliderButton isSlider:YES];
             
             // Reset the frame of all the intermediate buttons
             for (NSInteger segmentIndex = 1; segmentIndex <= self.numberOfSegments; segmentIndex++)
             {
                 UIButton *segmentButton = [self viewWithTag:segmentIndex];
                 segmentButton.center = [self getSegmentCenterPointForSegmentIndex:segmentIndex];
+                [self setImageForSegmentOrSliderButton:segmentButton isSlider:NO];
             }
         }
     }
@@ -124,28 +131,20 @@
     }
 }
 
-- (void)setRangeSliderBackgroundColor:(UIColor *)rangeSliderBackgroundColor
-{
-    _rangeSliderBackgroundColor = rangeSliderBackgroundColor;
-    _sliderBackgroundView.backgroundColor = rangeSliderBackgroundColor;
-}
-
-- (void)setRangeSliderForegroundColor:(UIColor *)rangeSliderForegroundColor
-{
-    _rangeSliderForegroundColor = rangeSliderForegroundColor;
-    _sliderForegroundView.backgroundColor = rangeSliderForegroundColor;
-}
-
 #pragma mark - Default Initializaer
 - (void)setDefaultValues
 {
     self.requireSegments = NO;
     self.numberOfSegments = 2;
+    
     self.rangeSliderBackgroundColor = [UIColor grayColor];
     self.rangeSliderForegroundColor = [UIColor greenColor];
     
     self.sliderSepertorWidth = SLIDER_BUTTON_WIDTH;
     self.segmentWidth = [self getSegmentWidthForSegmentCount:_numberOfSegments];
+    
+    self.sliderSize = CGSizeMake(20, 20);
+    self.segmentSize = CGSizeMake(20, 20);
 }
 
 - (void)initSliderViews
@@ -159,8 +158,8 @@
     self.sliderForegroundView.backgroundColor = self.rangeSliderForegroundColor;
     [self addSubview:self.sliderForegroundView];
     
-    self.startSliderButton = [self getSegmentButtonWithSegmentIndex:1];
-    self.endSliderButton = [self getSegmentButtonWithSegmentIndex:self.numberOfSegments];
+    self.startSliderButton = [self getSegmentButtonWithSegmentIndex:1 isSlider:YES];
+    self.endSliderButton = [self getSegmentButtonWithSegmentIndex:self.numberOfSegments isSlider:YES];
     
     [self addSubview:self.startSliderButton];
     [self addSubview:self.endSliderButton];
@@ -173,23 +172,40 @@
 {
     for (NSInteger segmentIndex = 1; segmentIndex <= self.numberOfSegments; segmentIndex++)
     {
-        UIButton *segmentButton = [self getSegmentButtonWithSegmentIndex:segmentIndex];
+        UIButton *segmentButton = [self getSegmentButtonWithSegmentIndex:segmentIndex isSlider:NO];
         segmentButton.tag = segmentIndex;
         [self addSubview:segmentButton];
     }
 }
 
-- (UIButton *)getSegmentButtonWithSegmentIndex:(NSInteger)segmentIndex
+- (UIButton *)getSegmentButtonWithSegmentIndex:(NSInteger)segmentIndex isSlider:(BOOL)isSlider
 {
     // Create rounded button for representing slider segments
     UIButton *segmentButton = [UIButton buttonWithType:UIButtonTypeCustom];
     segmentButton.frame = CGRectMake(0, 0, SLIDER_BUTTON_WIDTH, SLIDER_BUTTON_WIDTH);
     segmentButton.center = [self getSegmentCenterPointForSegmentIndex:segmentIndex];
-    segmentButton.backgroundColor = [UIColor redColor];
-    segmentButton.layer.masksToBounds = YES;
-    segmentButton.layer.cornerRadius = SLIDER_BUTTON_WIDTH/2;
+    [self setImageForSegmentOrSliderButton:segmentButton isSlider:isSlider];
     
     return segmentButton;
+}
+
+- (UIImage *)getImageWithSize:(CGSize)size
+{
+    UIView *imageView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, size.width, size.height)];
+    imageView.backgroundColor = [UIColor grayColor];
+    
+    UIGraphicsBeginImageContextWithOptions(CGSizeMake(size.width, size.height), NO, 1.0);
+    [imageView.layer renderInContext:UIGraphicsGetCurrentContext()];
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return image;
+}
+
+- (void)setImageForSegmentOrSliderButton:(UIButton *)button isSlider:(BOOL)isSlider
+{
+    [button setImage:[self getImageWithSize:isSlider ? self.sliderSize : self.segmentSize] forState:UIControlStateNormal];
+    button.imageView.layer.masksToBounds = YES;
+    button.imageView.layer.cornerRadius = button.imageView.frame.size.width/2;
 }
 
 #pragma mark - Pan Gesture for handling slider movements
@@ -314,7 +330,7 @@
 
 - (CGFloat)getSliderViewWidth
 {
-    return (CGRectGetMidX(self.endSliderButton.frame) - CGRectGetMidX(self.startSliderButton.frame) - SLIDER_BUTTON_WIDTH/2);
+    return (CGRectGetMidX(self.endSliderButton.frame) - CGRectGetMidX(self.startSliderButton.frame));
 }
 
 #pragma mark - Calculation for segment button frame

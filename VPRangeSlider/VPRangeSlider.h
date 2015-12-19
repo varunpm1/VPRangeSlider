@@ -49,4 +49,10 @@
 // The color that is used for rangeSlider selected range view. (i.e., the view that is between the slider points). Default is greenColor.
 @property (nonatomic, strong) UIColor *rangeSliderForegroundColor;
 
+// The size of the slider button. If not set, defaults to (20,20).
+@property (nonatomic, assign) CGSize sliderSize;
+
+// The size of the segments. If not set, defaults to (20,20).
+@property (nonatomic, assign) CGSize segmentSize;
+
 @end

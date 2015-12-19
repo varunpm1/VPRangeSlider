@@ -23,6 +23,10 @@
     
     self.rangeSliderView.requireSegments = YES;
     self.rangeSliderView.numberOfSegments = 4;
+    self.rangeSliderView.sliderSize = CGSizeMake(10, 10);
+    self.rangeSliderView.segmentSize = CGSizeMake(10, 10);
+    
+    self.rangeSliderView.rangeSliderForegroundColor = [UIColor redColor];
 }
 
 - (void)didReceiveMemoryWarning {

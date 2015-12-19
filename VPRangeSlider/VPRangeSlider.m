@@ -1,9 +1,8 @@
 //
 //  VPRangeSlider.m
-//  VPSliderViewExample
+//  Version 0.0.1
 //
 //  Created by Varun P M on 13/12/15.
-//  Copyright © 2015 VPN. All rights reserved.
 //
 
 #import "VPRangeSlider.h"

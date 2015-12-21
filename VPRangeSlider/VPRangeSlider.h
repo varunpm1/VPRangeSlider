@@ -29,6 +29,12 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol VPRangeSliderDelegate <NSObject>
+
+- (void)sliderScrolledToMinIndex:(NSInteger)minIndex andMaxIndex:(NSInteger)maxIndex;
+
+@end
+
 @interface VPRangeSlider : UIView
 
 // Bool value representing whether segments is needed or not. If NO, then simple 2 way slider will be generated. If YES, then numberOfSegments should be specified. Default is YES.
@@ -40,8 +46,14 @@
 // If the reuiqreSegments is set no NO, then this value should be set to define minimum distance between the range sliders. Default to 44.
 @property (nonatomic, assign) CGFloat sliderSepertorWidth;
 
-// The color for the extrem slider points. Default is redColor
+// The color for the extreme slider points. Default is redColor
 @property (nonatomic, strong) UIColor *rangeSliderButtonColor;
+
+// The color for segment button when it is within the selected range. Default is blueColor.
+@property (nonatomic, strong) UIColor *segmentSelectedColor;
+
+// The color for segment button when it is outside the selected range. Default is grayColor.
+@property (nonatomic, strong) UIColor *segmentUnSelectedColor;
 
 // The color that is used for rangeSlider unselected range view. (i.e., the view that is not within the slider points). Default is grayColor.
 @property (nonatomic, strong) UIColor *rangeSliderBackgroundColor;
@@ -54,5 +66,18 @@
 
 // The size of the segments. If not set, defaults to (20,20).
 @property (nonatomic, assign) CGSize segmentSize;
+
+// The label font to be used for min/max range display. Default is system font with fontSize 15.
+@property (nonatomic, strong) UIFont *rangeDisplayLabelFont;
+
+// The label color to be used for min range display. Default is red Color.
+@property (nonatomic, strong) UIColor *rangeDisplayLabelColor;
+
+// The min and max range label text to be set by caller
+@property (nonatomic, strong) NSString *minRangeText;
+@property (nonatomic, strong) NSString *maxRangeText;
+
+// The delegate property
+@property (nonatomic, weak) id<VPRangeSliderDelegate> delegate;
 
 @end

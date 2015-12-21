@@ -25,6 +25,10 @@
 @property (nonatomic, strong) UIButton *startSliderButton;
 @property (nonatomic, strong) UIButton *endSliderButton;
 
+// The label placed below the min and max sliders
+@property (nonatomic, strong) UILabel *minRangeLabel;
+@property (nonatomic, strong) UILabel *maxRangeLabel;
+
 @end
 
 @implementation VPRangeSlider
@@ -92,6 +96,9 @@
             self.startSliderButton.center = CGPointMake(SLIDER_BUTTON_WIDTH/2, CGRectGetMidY(self.sliderBackgroundView.frame));
             self.endSliderButton.center = [self getSegmentCenterPointForSegmentIndex:self.numberOfSegments];
             
+            self.minRangeLabel.center = CGPointMake(SLIDER_BUTTON_WIDTH / 2, CGRectGetMidY(self.bounds) + SLIDER_BUTTON_WIDTH);
+            self.maxRangeLabel.center = CGPointMake(CGRectGetMaxX(self.bounds) - SLIDER_BUTTON_WIDTH / 2, CGRectGetMidY(self.bounds) + SLIDER_BUTTON_WIDTH);
+
             [self setImageForSegmentOrSliderButton:self.startSliderButton isSlider:YES];
             [self setImageForSegmentOrSliderButton:self.endSliderButton isSlider:YES];
             
@@ -101,6 +108,14 @@
                 UIButton *segmentButton = [self viewWithTag:segmentIndex];
                 segmentButton.center = [self getSegmentCenterPointForSegmentIndex:segmentIndex];
                 [self setImageForSegmentOrSliderButton:segmentButton isSlider:NO];
+            }
+            
+            // Call the delegate to set the initial label for min range and max range
+            if ([self.delegate respondsToSelector:@selector(sliderScrolledToMinIndex:andMaxIndex:)])
+            {
+                [self.delegate sliderScrolledToMinIndex:0 andMaxIndex:self.numberOfSegments - 1];
+                self.minRangeLabel.text = self.minRangeText;
+                self.maxRangeLabel.text = self.maxRangeText;
             }
         }
     }
@@ -133,6 +148,26 @@
     
     self.rangeSliderBackgroundColor = [UIColor grayColor];
     self.rangeSliderForegroundColor = [UIColor greenColor];
+    
+    self.rangeDisplayLabelFont = [UIFont systemFontOfSize:15.0f];
+    self.rangeDisplayLabelColor = [UIColor redColor];
+    
+    self.segmentSelectedColor = [UIColor blueColor];
+    self.segmentUnSelectedColor = [UIColor grayColor];
+    
+    self.minRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 50, 30)];
+    self.minRangeLabel.center = CGPointMake(SLIDER_BUTTON_WIDTH / 2, CGRectGetMidY(self.bounds) + SLIDER_BUTTON_WIDTH);
+    [self.minRangeLabel setTextColor:self.rangeDisplayLabelColor];
+    [self.minRangeLabel setTextAlignment:NSTextAlignmentCenter];
+    [self.minRangeLabel setFont:self.rangeDisplayLabelFont];
+    [self addSubview:self.minRangeLabel];
+    
+    self.maxRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 50, 30)];
+    self.maxRangeLabel.center = CGPointMake(CGRectGetMaxX(self.bounds) - SLIDER_BUTTON_WIDTH / 2, CGRectGetMidY(self.bounds) + SLIDER_BUTTON_WIDTH);
+    [self.maxRangeLabel setTextColor:self.rangeDisplayLabelColor];
+    [self.maxRangeLabel setTextAlignment:NSTextAlignmentCenter];
+    [self.maxRangeLabel setFont:self.rangeDisplayLabelFont];
+    [self addSubview:self.maxRangeLabel];
     
     self.sliderSepertorWidth = SLIDER_BUTTON_WIDTH;
     self.segmentWidth = [self getSegmentWidthForSegmentCount:_numberOfSegments];
@@ -183,10 +218,10 @@
     return segmentButton;
 }
 
-- (UIImage *)getImageWithSize:(CGSize)size
+- (UIImage *)getImageWithSize:(CGSize)size withColor:(UIColor *)backgroundColor
 {
     UIView *imageView = [[UIView alloc]initWithFrame:CGRectMake(0, 0, size.width, size.height)];
-    imageView.backgroundColor = [UIColor grayColor];
+    imageView.backgroundColor = backgroundColor;
     
     UIGraphicsBeginImageContextWithOptions(CGSizeMake(size.width, size.height), NO, 1.0);
     [imageView.layer renderInContext:UIGraphicsGetCurrentContext()];
@@ -197,7 +232,7 @@
 
 - (void)setImageForSegmentOrSliderButton:(UIButton *)button isSlider:(BOOL)isSlider
 {
-    [button setImage:[self getImageWithSize:isSlider ? self.sliderSize : self.segmentSize] forState:UIControlStateNormal];
+    [button setImage:[self getImageWithSize:isSlider ? self.sliderSize : self.segmentSize withColor:self.segmentSelectedColor] forState:UIControlStateNormal];
     button.imageView.layer.masksToBounds = YES;
     button.imageView.layer.cornerRadius = button.imageView.frame.size.width/2;
 }
@@ -278,6 +313,14 @@
                 
                 // Change the x and width for slider foreground view
                 self.sliderForegroundView.frame = CGRectMake(self.startSliderButton.frame.origin.x + SLIDER_BUTTON_WIDTH/2, self.sliderForegroundView.frame.origin.y, [self getSliderViewWidth], self.sliderForegroundView.frame.size.height);
+                
+                self.minRangeLabel.center = CGPointMake(CGRectGetMidX(self.startSliderButton.frame), CGRectGetMaxY(self.startSliderButton.frame) + SLIDER_BUTTON_WIDTH / 2);
+                
+                if (self.requireSegments)
+                {
+                    // Update the intermediate segment colors
+                    [self updateSegmentColorForPoint:point];
+                }
             }];
         }
     }
@@ -291,6 +334,14 @@
                 
                 // Change the width for slider foreground view
                 self.sliderForegroundView.frame = CGRectMake(self.sliderForegroundView.frame.origin.x, self.sliderForegroundView.frame.origin.y, [self getSliderViewWidth], self.sliderForegroundView.frame.size.height);
+                
+                self.maxRangeLabel.center = CGPointMake(CGRectGetMidX(self.endSliderButton.frame), CGRectGetMaxY(self.endSliderButton.frame) + SLIDER_BUTTON_WIDTH / 2);
+                
+                if (self.requireSegments)
+                {
+                    // Update the intermediate segment colors
+                    [self updateSegmentColorForPoint:point];
+                }
             }];
         }
     }
@@ -301,6 +352,25 @@
 {
     NSInteger nearestSegmentIndex = round((point.x - SLIDER_BUTTON_WIDTH / 2) / self.segmentWidth);
     [self sliderDidSlideForPoint:CGPointMake(SLIDER_BUTTON_WIDTH/2 + nearestSegmentIndex * self.segmentWidth, point.y)];
+    
+    NSInteger startIndex = CGRectGetMinX(self.startSliderButton.frame) / self.segmentWidth;
+    NSInteger endIndex = CGRectGetMinX(self.endSliderButton.frame) / self.segmentWidth;
+    
+    if ([self.startSliderButton isSelected])
+    {
+        startIndex = nearestSegmentIndex;
+    }
+    else if ([self.endSliderButton isSelected])
+    {
+        endIndex = nearestSegmentIndex;
+    }
+    
+    if ([self.delegate respondsToSelector:@selector(sliderScrolledToMinIndex:andMaxIndex:)])
+    {
+        [self.delegate sliderScrolledToMinIndex:startIndex andMaxIndex:endIndex];
+        self.minRangeLabel.text = self.minRangeText;
+        self.maxRangeLabel.text = self.maxRangeText;
+    }
 }
 
 - (BOOL)shouldStartButtonSlideForPoint:(CGPoint)point
@@ -327,6 +397,43 @@
     }
     
     return (round(point.x) >= round(startButtonMidPoint) && point.x <= self.frame.size.width - SLIDER_BUTTON_WIDTH/2);
+}
+
+#pragma mark - Update the segments color on scrolling slider
+- (void)updateSegmentColorForPoint:(CGPoint)point
+{
+    if ([self.startSliderButton isSelected])
+    {
+        [self updateSegmentColorWithStartIndex:ceil((CGRectGetMidX(self.startSliderButton.frame) - SLIDER_BUTTON_WIDTH / 2) / self.segmentWidth) + 1 andEndIndex:ceil((CGRectGetMidX(self.endSliderButton.frame) - SLIDER_BUTTON_WIDTH / 2) / self.segmentWidth) + 1];
+    }
+    else if ([self.endSliderButton isSelected])
+    {
+        [self updateSegmentColorWithStartIndex:ceil(CGRectGetMinX(self.startSliderButton.frame) / self.segmentWidth) + 1 andEndIndex:floor(CGRectGetMinX(self.endSliderButton.frame) / self.segmentWidth) + 1];
+    }
+}
+
+- (void)updateSegmentColorWithStartIndex:(NSInteger)startIndex andEndIndex:(NSInteger)endIndex
+{
+    // Segments before startSegment slider
+    for (NSInteger segmentIndex = 1; segmentIndex < startIndex; segmentIndex++)
+    {
+        UIButton *segmentButton = [self viewWithTag:segmentIndex];
+        [segmentButton setImage:[self getImageWithSize:self.segmentSize withColor:self.segmentUnSelectedColor] forState:UIControlStateNormal];
+    }
+    
+    // Segments between startSegment slider and endSegment slider
+    for (NSInteger segmentIndex = startIndex; segmentIndex <= endIndex; segmentIndex++)
+    {
+        UIButton *segmentButton = [self viewWithTag:segmentIndex];
+        [segmentButton setImage:[self getImageWithSize:self.segmentSize withColor:self.segmentSelectedColor] forState:UIControlStateNormal];
+    }
+    
+    // Segments after endSegment slider
+    for (NSInteger segmentIndex = endIndex + 1; segmentIndex <= self.numberOfSegments; segmentIndex++)
+    {
+        UIButton *segmentButton = [self viewWithTag:segmentIndex];
+        [segmentButton setImage:[self getImageWithSize:self.segmentSize withColor:self.segmentUnSelectedColor] forState:UIControlStateNormal];
+    }
 }
 
 #pragma mark - Calculation for slider frame

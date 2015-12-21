@@ -40,8 +40,14 @@
 // If the reuiqreSegments is set no NO, then this value should be set to define minimum distance between the range sliders. Default to 44.
 @property (nonatomic, assign) CGFloat sliderSepertorWidth;
 
-// The color for the extrem slider points. Default is redColor
+// The color for the extreme slider points. Default is redColor
 @property (nonatomic, strong) UIColor *rangeSliderButtonColor;
+
+// The color for segment button when it is within the selected range. Default is blueColor.
+@property (nonatomic, strong) UIColor *segmentSelectedColor;
+
+// The color for segment button when it is outside the selected range. Default is grayColor.
+@property (nonatomic, strong) UIColor *segmentUnSelectedColor;
 
 // The color that is used for rangeSlider unselected range view. (i.e., the view that is not within the slider points). Default is grayColor.
 @property (nonatomic, strong) UIColor *rangeSliderBackgroundColor;

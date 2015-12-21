@@ -29,6 +29,12 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol VPRangeSliderDelegate <NSObject>
+
+- (void)sliderScrolledToMinIndex:(NSInteger)minIndex andMaxIndex:(NSInteger)maxIndex;
+
+@end
+
 @interface VPRangeSlider : UIView
 
 // Bool value representing whether segments is needed or not. If NO, then simple 2 way slider will be generated. If YES, then numberOfSegments should be specified. Default is YES.
@@ -60,5 +66,18 @@
 
 // The size of the segments. If not set, defaults to (20,20).
 @property (nonatomic, assign) CGSize segmentSize;
+
+// The label font to be used for min/max range display. Default is system font with fontSize 15.
+@property (nonatomic, strong) UIFont *rangeDisplayLabelFont;
+
+// The label color to be used for min range display. Default is red Color.
+@property (nonatomic, strong) UIColor *rangeDisplayLabelColor;
+
+// The min and max range label text to be set by caller
+@property (nonatomic, strong) NSString *minRangeText;
+@property (nonatomic, strong) NSString *maxRangeText;
+
+// The delegate property
+@property (nonatomic, weak) id<VPRangeSliderDelegate> delegate;
 
 @end

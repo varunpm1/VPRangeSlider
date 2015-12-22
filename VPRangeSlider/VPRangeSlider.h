@@ -31,6 +31,11 @@
 
 @protocol VPRangeSliderDelegate <NSObject>
 
+@optional
+// Called when the user is panning. Used to update the display label while moving the slider. minPercent and maxPercent represents the percentage the slider has covered. (Between 0% and 100%)
+- (void)sliderScrollingWithMinPercent:(CGFloat)minPercent andMaxPercent:(CGFloat)maxPercent;
+
+// Called after the segment reaches it's nearest point (In other words, when touch ends).
 - (void)sliderScrolledToMinIndex:(NSInteger)minIndex andMaxIndex:(NSInteger)maxIndex;
 
 @end
@@ -46,11 +51,20 @@
 // If the reuiqreSegments is set no NO, then this value should be set to define minimum distance between the range sliders. Default to 44.
 @property (nonatomic, assign) CGFloat sliderSepertorWidth;
 
+// The image used for displaying slider buttons. By default not set. rangeSliderButtonColor will be used if not set
+@property (nonatomic, strong) UIImage *rangeSliderButtonImage;
+
 // The color for the extreme slider points. Default is redColor
 @property (nonatomic, strong) UIColor *rangeSliderButtonColor;
 
+// The image for segment button when it is within the selected range. If not set, segmentSelectedColor will be used.
+@property (nonatomic, strong) UIImage *segmentSelectedImage;
+
 // The color for segment button when it is within the selected range. Default is blueColor.
 @property (nonatomic, strong) UIColor *segmentSelectedColor;
+
+// The image for segment button when it is outside the selected range. If not set, segmentUnSelectedColor will be used.
+@property (nonatomic, strong) UIImage *segmentUnSelectedImage;
 
 // The color for segment button when it is outside the selected range. Default is grayColor.
 @property (nonatomic, strong) UIColor *segmentUnSelectedColor;

@@ -34,6 +34,7 @@ NSString * const SliderValue [] = {
     self.rangeSliderView.segmentSize = CGSizeMake(10, 10);
     
     self.rangeSliderView.rangeSliderForegroundColor = [UIColor redColor];
+    self.rangeSliderView.rangeSliderButtonImage = [UIImage imageNamed:@"slider"];
     [self.rangeSliderView setDelegate:self];
 }
 
@@ -43,6 +44,12 @@ NSString * const SliderValue [] = {
 }
 
 #pragma mark - VPRangeSliderDelegate
+- (void)sliderScrollingWithMinPercent:(CGFloat)minPercent andMaxPercent:(CGFloat)maxPercent
+{
+    self.rangeSliderView.minRangeText = [NSString stringWithFormat:@"%.0f", minPercent];
+    self.rangeSliderView.maxRangeText = [NSString stringWithFormat:@"%.0f", maxPercent];
+}
+
 - (void)sliderScrolledToMinIndex:(NSInteger)minIndex andMaxIndex:(NSInteger)maxIndex
 {
     self.rangeSliderView.minRangeText = SliderValue[minIndex];

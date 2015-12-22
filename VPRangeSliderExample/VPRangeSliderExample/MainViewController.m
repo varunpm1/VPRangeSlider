@@ -34,6 +34,7 @@ NSString * const SliderValue [] = {
     self.rangeSliderView.segmentSize = CGSizeMake(10, 10);
     
     self.rangeSliderView.rangeSliderForegroundColor = [UIColor redColor];
+    self.rangeSliderView.rangeSliderButtonImage = [UIImage imageNamed:@"slider"];
     [self.rangeSliderView setDelegate:self];
 }
 

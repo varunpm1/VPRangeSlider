@@ -137,6 +137,8 @@
     if (self.requireSegments)
     {
         [self addSegmentButtons];
+        [self addSubview:self.startSliderButton];
+        [self addSubview:self.endSliderButton];
     }
 }
 
@@ -232,7 +234,19 @@
 
 - (void)setImageForSegmentOrSliderButton:(UIButton *)button isSlider:(BOOL)isSlider
 {
-    [button setImage:[self getImageWithSize:isSlider ? self.sliderSize : self.segmentSize withColor:self.segmentSelectedColor] forState:UIControlStateNormal];
+    if (isSlider && self.rangeSliderButtonImage)
+    {
+        [button setImage:self.rangeSliderButtonImage forState:UIControlStateNormal];
+    }
+    else if (self.segmentSelectedImage)
+    {
+        [button setImage:self.segmentSelectedImage forState:UIControlStateNormal];
+    }
+    else
+    {
+        [button setImage:[self getImageWithSize:isSlider ? self.sliderSize : self.segmentSize withColor:self.segmentSelectedColor] forState:UIControlStateNormal];
+    }
+    
     button.imageView.layer.masksToBounds = YES;
     button.imageView.layer.cornerRadius = button.imageView.frame.size.width/2;
 }
@@ -418,21 +432,42 @@
     for (NSInteger segmentIndex = 1; segmentIndex < startIndex; segmentIndex++)
     {
         UIButton *segmentButton = [self viewWithTag:segmentIndex];
-        [segmentButton setImage:[self getImageWithSize:self.segmentSize withColor:self.segmentUnSelectedColor] forState:UIControlStateNormal];
+        if (self.segmentUnSelectedImage)
+        {
+            [segmentButton setImage:self.segmentUnSelectedImage forState:UIControlStateNormal];
+        }
+        else
+        {
+            [segmentButton setImage:[self getImageWithSize:self.segmentSize withColor:self.segmentUnSelectedColor] forState:UIControlStateNormal];
+        }
     }
     
     // Segments between startSegment slider and endSegment slider
     for (NSInteger segmentIndex = startIndex; segmentIndex <= endIndex; segmentIndex++)
     {
         UIButton *segmentButton = [self viewWithTag:segmentIndex];
-        [segmentButton setImage:[self getImageWithSize:self.segmentSize withColor:self.segmentSelectedColor] forState:UIControlStateNormal];
+        if (self.segmentSelectedImage)
+        {
+            [segmentButton setImage:self.segmentSelectedImage forState:UIControlStateNormal];
+        }
+        else
+        {
+            [segmentButton setImage:[self getImageWithSize:self.segmentSize withColor:self.segmentSelectedColor] forState:UIControlStateNormal];
+        }
     }
     
     // Segments after endSegment slider
     for (NSInteger segmentIndex = endIndex + 1; segmentIndex <= self.numberOfSegments; segmentIndex++)
     {
         UIButton *segmentButton = [self viewWithTag:segmentIndex];
-        [segmentButton setImage:[self getImageWithSize:self.segmentSize withColor:self.segmentUnSelectedColor] forState:UIControlStateNormal];
+        if (self.segmentUnSelectedImage)
+        {
+            [segmentButton setImage:self.segmentUnSelectedImage forState:UIControlStateNormal];
+        }
+        else
+        {
+            [segmentButton setImage:[self getImageWithSize:self.segmentSize withColor:self.segmentUnSelectedColor] forState:UIControlStateNormal];
+        }
     }
 }
 

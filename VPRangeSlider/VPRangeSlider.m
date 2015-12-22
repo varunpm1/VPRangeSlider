@@ -336,6 +336,8 @@
                     // Update the intermediate segment colors
                     [self updateSegmentColorForPoint:point];
                 }
+            } completion:^(BOOL finished) {
+                [self callScrollDelegate];
             }];
         }
     }
@@ -357,8 +359,23 @@
                     // Update the intermediate segment colors
                     [self updateSegmentColorForPoint:point];
                 }
+                
+            } completion:^(BOOL finished) {
+                [self callScrollDelegate];
             }];
         }
+    }
+}
+
+- (void)callScrollDelegate
+{
+    CGFloat minPercent = (CGRectGetMinX(self.startSliderButton.frame) / CGRectGetWidth(self.sliderBackgroundView.frame) * 100);
+    CGFloat maxPercent = (CGRectGetMinX(self.endSliderButton.frame) / CGRectGetWidth(self.sliderBackgroundView.frame) * 100);
+    if ([self.delegate respondsToSelector:@selector(sliderScrollingWithMinPercent:andMaxPercent:)])
+    {
+        [self.delegate sliderScrollingWithMinPercent:minPercent andMaxPercent:maxPercent];
+        self.minRangeLabel.text = self.minRangeText;
+        self.maxRangeLabel.text = self.maxRangeText;
     }
 }
 

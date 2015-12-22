@@ -205,6 +205,7 @@
     {
         UIButton *segmentButton = [self getSegmentButtonWithSegmentIndex:segmentIndex isSlider:NO];
         segmentButton.tag = segmentIndex;
+        segmentButton.userInteractionEnabled = NO;
         [self addSubview:segmentButton];
     }
 }

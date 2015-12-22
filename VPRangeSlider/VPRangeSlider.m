@@ -1,6 +1,6 @@
 //
 //  VPRangeSlider.m
-//  Version 0.0.1
+//  Version 0.1.0
 //
 //  Created by Varun P M on 13/12/15.
 //

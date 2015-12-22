@@ -1,5 +1,5 @@
 # VPRangeSlider
-Simple 2 way slider with custom views and segments. Similar to price range selector
+Simple 2 way slider with custom views and segments for iOS. Similar to price range selector
 seen in different apps/websites.
 
 ## Installation

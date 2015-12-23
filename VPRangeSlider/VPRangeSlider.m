@@ -427,6 +427,10 @@
     {
         startButtonMidPoint += self.segmentWidth;
     }
+    else
+    {
+        startButtonMidPoint += self.sliderSepertorWidth;
+    }
     
     return (round(point.x) >= round(startButtonMidPoint) && point.x <= self.frame.size.width - SLIDER_BUTTON_WIDTH/2);
 }

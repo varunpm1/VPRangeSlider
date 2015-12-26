@@ -1,5 +1,6 @@
 # VPRangeSlider
-This is a 2 way slider for iOS. Similar to price range selector
+This is a 2 way slider for iOS. You can create segmented or
+unsegmented range sliders. Similar to price range selector
 seen in different apps/websites. You can customize the views as
 per your requirements.
 
@@ -22,6 +23,8 @@ create an outlet.
 
 For the oulet/property of the view set the necessary properties. 
 If more customization is needed, you can set the optional parameters.
+
+If the requiresSegments is set to YES, then segmented range slider is created. Else normal slider is created.
 
 If needed, then you can make use of 2 delegates.
 

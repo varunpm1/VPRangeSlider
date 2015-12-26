@@ -32,7 +32,7 @@ This delegate is called every time the slider is moved/panned until the sliding 
 - (void)sliderScrolledToMinIndex:(NSInteger)minIndex andMaxIndex:(NSInteger)maxIndex
 This delegate is called when the slider stops at any segmented index.
 
-# ![Screenshot](https://raw.github.com/varunpm1/VPRangeSlider/master/VPRangeSlider-ScreenShot.png)
+# ![Screenshot](https://github.com/varunpm1/VPRangeSlider/master/VPRangeSlider-ScreenShot.png)
 
 ## Contributing
 1. Fork it!

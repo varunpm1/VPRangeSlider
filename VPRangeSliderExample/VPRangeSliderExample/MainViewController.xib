@@ -8,6 +8,7 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="MainViewController">
             <connections>
                 <outlet property="rangeSliderView" destination="pec-Dr-SCv" id="bgz-2d-30f"/>
+                <outlet property="segmentedRangeSliderView" destination="S7W-La-mBx" id="CYV-D1-ycR"/>
                 <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
             </connections>
         </placeholder>
@@ -16,19 +17,30 @@
             <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pec-Dr-SCv" customClass="VPRangeSlider">
-                    <rect key="frame" x="20" y="270" width="335" height="128"/>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="S7W-La-mBx" customClass="VPRangeSlider">
+                    <rect key="frame" x="20" y="451" width="335" height="128"/>
                     <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
                     <constraints>
-                        <constraint firstAttribute="height" constant="128" id="2N9-XI-Fao"/>
+                        <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="128" id="hPl-Ms-Li3"/>
+                        <constraint firstAttribute="height" constant="128" id="nSZ-ve-FAx"/>
+                    </constraints>
+                </view>
+                <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pec-Dr-SCv" customClass="VPRangeSlider">
+                    <rect key="frame" x="20" y="60" width="335" height="128"/>
+                    <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="128" id="Pow-Su-8Io"/>
                     </constraints>
                 </view>
             </subviews>
             <color key="backgroundColor" white="0.66666666666666663" alpha="1" colorSpace="calibratedWhite"/>
             <constraints>
-                <constraint firstItem="pec-Dr-SCv" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="Bsb-VE-u3s"/>
-                <constraint firstAttribute="trailing" secondItem="pec-Dr-SCv" secondAttribute="trailing" constant="20" id="ROO-2V-SzE"/>
-                <constraint firstItem="pec-Dr-SCv" firstAttribute="centerY" secondItem="i5M-Pr-FkT" secondAttribute="centerY" id="e9M-NF-HQp"/>
+                <constraint firstItem="pec-Dr-SCv" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" constant="60" id="Glj-5P-YE1"/>
+                <constraint firstItem="S7W-La-mBx" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="HWl-gG-Cru"/>
+                <constraint firstAttribute="trailing" secondItem="S7W-La-mBx" secondAttribute="trailing" constant="20" id="HYD-oK-Cun"/>
+                <constraint firstAttribute="bottom" secondItem="S7W-La-mBx" secondAttribute="bottom" constant="88" id="cpb-lD-wME"/>
+                <constraint firstItem="pec-Dr-SCv" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="vXm-aE-75K"/>
+                <constraint firstAttribute="trailing" secondItem="pec-Dr-SCv" secondAttribute="trailing" constant="20" id="xTe-Nk-A1Z"/>
             </constraints>
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="129.5" y="332.5"/>

@@ -29,14 +29,16 @@
 
 #import <UIKit/UIKit.h>
 
+@class VPRangeSlider;
+
 @protocol VPRangeSliderDelegate <NSObject>
 
 @optional
 // Called when the user is panning. Used to update the display label while moving the slider. minPercent and maxPercent represents the percentage the slider has covered. (Between 0% and 100%)
-- (void)sliderScrollingWithMinPercent:(CGFloat)minPercent andMaxPercent:(CGFloat)maxPercent;
+- (void)sliderScrolling:(VPRangeSlider *)slider withMinPercent:(CGFloat)minPercent andMaxPercent:(CGFloat)maxPercent;
 
 // Called after the segment reaches it's nearest point (In other words, when touch ends).
-- (void)sliderScrolledToMinIndex:(NSInteger)minIndex andMaxIndex:(NSInteger)maxIndex;
+- (void)sliderScrolled:(VPRangeSlider *)slider toMinIndex:(NSInteger)minIndex andMaxIndex:(NSInteger)maxIndex;
 
 @end
 

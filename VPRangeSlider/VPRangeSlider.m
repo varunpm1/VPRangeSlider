@@ -111,9 +111,9 @@
             }
             
             // Call the delegate to set the initial label for min range and max range
-            if ([self.delegate respondsToSelector:@selector(sliderScrolledToMinIndex:andMaxIndex:)])
+            if ([self.delegate respondsToSelector:@selector(sliderScrolled:toMinIndex:andMaxIndex:)])
             {
-                [self.delegate sliderScrolledToMinIndex:0 andMaxIndex:self.numberOfSegments - 1];
+                [self.delegate sliderScrolled:self toMinIndex:0 andMaxIndex:self.numberOfSegments - 1];
                 self.minRangeLabel.text = self.minRangeText;
                 self.maxRangeLabel.text = self.maxRangeText;
             }
@@ -371,9 +371,9 @@
 {
     CGFloat minPercent = (CGRectGetMinX(self.startSliderButton.frame) / CGRectGetWidth(self.sliderBackgroundView.frame) * 100);
     CGFloat maxPercent = (CGRectGetMinX(self.endSliderButton.frame) / CGRectGetWidth(self.sliderBackgroundView.frame) * 100);
-    if ([self.delegate respondsToSelector:@selector(sliderScrollingWithMinPercent:andMaxPercent:)])
+    if ([self.delegate respondsToSelector:@selector(sliderScrolling:withMinPercent:andMaxPercent:)])
     {
-        [self.delegate sliderScrollingWithMinPercent:minPercent andMaxPercent:maxPercent];
+        [self.delegate sliderScrolling:self withMinPercent:minPercent andMaxPercent:maxPercent];
         self.minRangeLabel.text = self.minRangeText;
         self.maxRangeLabel.text = self.maxRangeText;
     }
@@ -397,9 +397,9 @@
         endIndex = nearestSegmentIndex;
     }
     
-    if ([self.delegate respondsToSelector:@selector(sliderScrolledToMinIndex:andMaxIndex:)])
+    if ([self.delegate respondsToSelector:@selector(sliderScrolled:toMinIndex:andMaxIndex:)])
     {
-        [self.delegate sliderScrolledToMinIndex:startIndex andMaxIndex:endIndex];
+        [self.delegate sliderScrolled:self toMinIndex:startIndex andMaxIndex:endIndex];
         self.minRangeLabel.text = self.minRangeText;
         self.maxRangeLabel.text = self.maxRangeText;
     }

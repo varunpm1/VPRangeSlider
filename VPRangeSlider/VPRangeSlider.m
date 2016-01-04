@@ -1,6 +1,6 @@
 //
 //  VPRangeSlider.m
-//  Version 0.1.0
+//  Version 0.1.2
 //
 //  Created by Varun P M on 13/12/15.
 //
@@ -318,6 +318,8 @@
 - (void)sliderDidSlideForPoint:(CGPoint)point
 {
     // Check if startButton is moved or endButton is moved. Based on the moved button, set the frame of the slider button and foregroundSliderView
+    point = [self resetFrameOnBoundsCrossForPoint:point];
+    
     if ([self.startSliderButton isSelected])
     {
         if ([self shouldStartButtonSlideForPoint:point])
@@ -367,6 +369,35 @@
     }
 }
 
+// Method that handles if the sliders move out of range
+- (CGPoint)resetFrameOnBoundsCrossForPoint:(CGPoint)point
+{
+    if ([self.startSliderButton isSelected])
+    {
+        if ([self sliderMidPointForPoint:point] >= CGRectGetMidX(self.endSliderButton.frame) - self.segmentWidth)
+        {
+            point.x = CGRectGetMidX(self.endSliderButton.frame) - self.segmentWidth;
+        }
+        else if (point.x < 0)
+        {
+            point.x = 0;
+        }
+    }
+    else if ([self.endSliderButton isSelected])
+    {
+        if (point.x <= CGRectGetMidX(self.startSliderButton.frame) + self.segmentWidth)
+        {
+            point.x = CGRectGetMidX(self.startSliderButton.frame) + self.segmentWidth;
+        }
+        else if ([self sliderMidPointForPoint:point] >= CGRectGetMaxX(self.sliderBackgroundView.bounds))
+        {
+            point.x = CGRectGetMaxX(self.sliderBackgroundView.bounds) + SLIDER_BUTTON_WIDTH / 2;
+        }
+    }
+    
+    return point;
+}
+
 - (void)callScrollDelegate
 {
     CGFloat minPercent = (CGRectGetMinX(self.startSliderButton.frame) / CGRectGetWidth(self.sliderBackgroundView.frame) * 100);
@@ -382,6 +413,8 @@
 // Slide to nearest position
 - (void)moveSliderToNearestSegmentWithEndingPoint:(CGPoint)point
 {
+    point = [self resetFrameOnBoundsCrossForPoint:point];
+    
     NSInteger nearestSegmentIndex = round((point.x - SLIDER_BUTTON_WIDTH / 2) / self.segmentWidth);
     [self sliderDidSlideForPoint:CGPointMake(SLIDER_BUTTON_WIDTH/2 + nearestSegmentIndex * self.segmentWidth, point.y)];
     

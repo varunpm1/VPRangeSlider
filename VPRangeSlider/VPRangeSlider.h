@@ -1,6 +1,6 @@
 //
 //  VPRangeSlider.h
-//  Version 0.1.0
+//  Version 0.1.2
 //
 //  Created by Varun P M on 13/12/15.
 //

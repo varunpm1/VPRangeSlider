@@ -26,6 +26,14 @@ If more customization is needed, you can set the optional parameters.
 
 If the requiresSegments is set to YES, then segmented range slider is created. Else normal slider is created.
 
+There are 2 public functions.
+
+- (void)scrollStartSliderToStartRange:(CGFloat)startRange andEndRange:(CGFloat)endRange;
+- (void)scrollStartSliderToIndex:(NSInteger)startIndex andEndIndex:(NSInteger)endIndex;
+
+The first method should only be used for smooth slider specifying the start and end range in percentages.
+The second method should only be used for segmented slider specifying the start and end index (1 - numberOfSegments).
+
 If needed, then you can make use of 2 delegates.
 
 - (void)sliderScrollingWithMinPercent:(CGFloat)minPercent andMaxPercent:(CGFloat)maxPercent

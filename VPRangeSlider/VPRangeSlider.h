@@ -97,10 +97,10 @@
 @property (nonatomic, weak) id<VPRangeSliderDelegate> delegate;
 
 // Function to scroll the ends of range slider (segmented or unsegemented) to the desired location.
-// The startRange and endRange should be in percentage for scrolling (0 - 100)
+// The startRange and endRange should be in percentage for scrolling (0 - 100) and should be separated by atleast "sliderSepertorWidth"
 - (void)scrollStartSliderToStartRange:(CGFloat)startRange andEndRange:(CGFloat)endRange;
 
-// The start index should be less than the end index and should be separated by atleast "sliderSepertorWidth". If not, it won't have any effect.
+// The start index should be less than the end index (1 - numberOfSegments). If not, it won't have any effect.
 - (void)scrollStartSliderToIndex:(NSInteger)startIndex andEndIndex:(NSInteger)endIndex;
 
 @end

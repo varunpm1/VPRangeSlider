@@ -29,6 +29,13 @@
 @property (nonatomic, strong) UILabel *minRangeLabel;
 @property (nonatomic, strong) UILabel *maxRangeLabel;
 
+// The segment index or percent for initial slider position loading for segmented and unsegmented respectively
+@property (nonatomic, assign) NSInteger minRangeInitialIndex;
+@property (nonatomic, assign) NSInteger maxRangeInitialIndex;
+
+@property (nonatomic, assign) CGFloat minRangeInitialPosition;
+@property (nonatomic, assign) CGFloat maxRangeInitialPosition;
+
 @end
 
 @implementation VPRangeSlider
@@ -96,8 +103,8 @@
             self.startSliderButton.center = CGPointMake(SLIDER_BUTTON_WIDTH/2, CGRectGetMidY(self.sliderBackgroundView.frame));
             self.endSliderButton.center = [self getSegmentCenterPointForSegmentIndex:self.numberOfSegments];
             
-            self.minRangeLabel.center = CGPointMake(SLIDER_BUTTON_WIDTH / 2, CGRectGetMidY(self.bounds) + SLIDER_BUTTON_WIDTH);
-            self.maxRangeLabel.center = CGPointMake(CGRectGetMaxX(self.bounds) - SLIDER_BUTTON_WIDTH / 2, CGRectGetMidY(self.bounds) + SLIDER_BUTTON_WIDTH);
+            self.minRangeLabel.center = CGPointMake(CGRectGetMidX(self.startSliderButton.frame), CGRectGetMidY(self.bounds) + SLIDER_BUTTON_WIDTH);
+            self.maxRangeLabel.center = CGPointMake(CGRectGetMidX(self.endSliderButton.frame), CGRectGetMidY(self.bounds) + SLIDER_BUTTON_WIDTH);
 
             [self setImageForSegmentOrSliderButton:self.startSliderButton isSlider:YES];
             [self setImageForSegmentOrSliderButton:self.endSliderButton isSlider:YES];
@@ -110,13 +117,8 @@
                 [self setImageForSegmentOrSliderButton:segmentButton isSlider:NO];
             }
             
-            // Call the delegate to set the initial label for min range and max range
-            if ([self.delegate respondsToSelector:@selector(sliderScrolled:toMinIndex:andMaxIndex:)])
-            {
-                [self.delegate sliderScrolled:self toMinIndex:0 andMaxIndex:self.numberOfSegments - 1];
-                self.minRangeLabel.text = self.minRangeText;
-                self.maxRangeLabel.text = self.maxRangeText;
-            }
+            // Slide the buttons if the initial position is needed
+            [self slideRangeSliderButtonsIfNeeded];
         }
     }
 }
@@ -165,7 +167,7 @@
     [self addSubview:self.minRangeLabel];
     
     self.maxRangeLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 50, 30)];
-    self.maxRangeLabel.center = CGPointMake(CGRectGetMaxX(self.bounds) - SLIDER_BUTTON_WIDTH / 2, CGRectGetMidY(self.bounds) + SLIDER_BUTTON_WIDTH);
+    self.maxRangeLabel.center = CGPointMake([self sliderMidPointForPoint:CGRectGetMaxX(self.bounds)], CGRectGetMidY(self.bounds) + SLIDER_BUTTON_WIDTH);
     [self.maxRangeLabel setTextColor:self.rangeDisplayLabelColor];
     [self.maxRangeLabel setTextAlignment:NSTextAlignmentCenter];
     [self.maxRangeLabel setFont:self.rangeDisplayLabelFont];
@@ -261,6 +263,21 @@
     [self addGestureRecognizer:panGesture];
 }
 
+#pragma mark - Public functions
+
+#pragma mark - Scroll to desired location on loading
+- (void)scrollStartSliderToStartRange:(CGFloat)startRange andEndRange:(CGFloat)endRange
+{
+    self.minRangeInitialPosition = startRange;
+    self.maxRangeInitialPosition = endRange;
+}
+
+- (void)scrollStartSliderToIndex:(NSInteger)startIndex andEndIndex:(NSInteger)endIndex
+{
+    self.minRangeInitialIndex = startIndex;
+    self.maxRangeInitialIndex = endIndex;
+}
+
 #pragma mark - Pan Gesture selector method
 - (void)handlePanGesture:(UIPanGestureRecognizer *)panGesture
 {
@@ -315,6 +332,57 @@
 }
 
 #pragma mark - Calculations for moving the rangeSliders
+- (void)slideRangeSliderButtonsIfNeeded
+{
+    CGPoint startScrollPoint = CGPointZero;
+    CGPoint endScrollPoint = CGPointMake(self.bounds.size.width, 0);
+    
+    if (self.requireSegments)
+    {
+        if (self.minRangeInitialIndex < self.maxRangeInitialIndex)
+        {
+            if (self.minRangeInitialIndex)
+            {
+                startScrollPoint.x = [self getSegmentCenterPointForSegmentIndex:self.minRangeInitialIndex].x;
+            }
+            
+            if (self.maxRangeInitialIndex)
+            {
+                endScrollPoint.x = [self getSegmentCenterPointForSegmentIndex:self.maxRangeInitialIndex].x;
+            }
+        }
+    }
+    else
+    {
+        if (self.minRangeInitialPosition)
+        {
+            startScrollPoint.x = self.sliderBackgroundView.frame.size.width * self.minRangeInitialPosition / 100 + SLIDER_BUTTON_WIDTH/2;
+        }
+        
+        if (self.maxRangeInitialPosition)
+        {
+            endScrollPoint.x = self.sliderBackgroundView.frame.size.width * self.maxRangeInitialPosition / 100 + SLIDER_BUTTON_WIDTH/2;
+        }
+    }
+    
+    [self scrollStartAndEndSliderForPoint:startScrollPoint andEndScrollPoint:endScrollPoint];
+    self.minRangeInitialIndex = 0;
+    self.maxRangeInitialIndex = 0;
+    self.minRangeInitialPosition = 0;
+    self.maxRangeInitialPosition = 0;
+}
+
+- (void)scrollStartAndEndSliderForPoint:(CGPoint)startScrollPoint andEndScrollPoint:(CGPoint)endScrollPoint
+{
+    self.startSliderButton.selected = YES;
+    [self sliderDidSlideForPoint:startScrollPoint];
+    self.startSliderButton.selected = NO;
+    
+    self.endSliderButton.selected = YES;
+    [self sliderDidSlideForPoint:endScrollPoint];
+    self.endSliderButton.selected = NO;
+}
+
 - (void)sliderDidSlideForPoint:(CGPoint)point
 {
     // Check if startButton is moved or endButton is moved. Based on the moved button, set the frame of the slider button and foregroundSliderView
@@ -326,7 +394,7 @@
         {
             [UIView animateWithDuration:0.1 animations:^{
                 // Change only the x value for startbutton
-                [self.startSliderButton setFrame:CGRectMake([self sliderMidPointForPoint:point], self.startSliderButton.frame.origin.y, self.startSliderButton.frame.size.width, self.startSliderButton.frame.size.height)];
+                [self.startSliderButton setFrame:CGRectMake([self sliderMidPointForPoint:point.x], self.startSliderButton.frame.origin.y, self.startSliderButton.frame.size.width, self.startSliderButton.frame.size.height)];
                 
                 // Change the x and width for slider foreground view
                 self.sliderForegroundView.frame = CGRectMake(self.startSliderButton.frame.origin.x + SLIDER_BUTTON_WIDTH/2, self.sliderForegroundView.frame.origin.y, [self getSliderViewWidth], self.sliderForegroundView.frame.size.height);
@@ -349,7 +417,7 @@
         {
             [UIView animateWithDuration:0.1 animations:^{
                 // Change only the x value for endbutton
-                [self.endSliderButton setFrame:CGRectMake([self sliderMidPointForPoint:point], self.endSliderButton.frame.origin.y, self.endSliderButton.frame.size.width, self.endSliderButton.frame.size.height)];
+                [self.endSliderButton setFrame:CGRectMake([self sliderMidPointForPoint:point.x], self.endSliderButton.frame.origin.y, self.endSliderButton.frame.size.width, self.endSliderButton.frame.size.height)];
                 
                 // Change the width for slider foreground view
                 self.sliderForegroundView.frame = CGRectMake(self.sliderForegroundView.frame.origin.x, self.sliderForegroundView.frame.origin.y, [self getSliderViewWidth], self.sliderForegroundView.frame.size.height);
@@ -374,9 +442,9 @@
 {
     if ([self.startSliderButton isSelected])
     {
-        if ([self sliderMidPointForPoint:point] >= CGRectGetMidX(self.endSliderButton.frame) - self.segmentWidth)
+        if ([self sliderMidPointForPoint:point.x] >= CGRectGetMidX(self.endSliderButton.frame) - (self.requireSegments ? self.segmentWidth : 0))
         {
-            point.x = CGRectGetMidX(self.endSliderButton.frame) - self.segmentWidth;
+            point.x = CGRectGetMidX(self.endSliderButton.frame) - (self.requireSegments ? self.segmentWidth : 0);
         }
         else if (point.x < 0)
         {
@@ -385,11 +453,11 @@
     }
     else if ([self.endSliderButton isSelected])
     {
-        if (point.x <= CGRectGetMidX(self.startSliderButton.frame) + self.segmentWidth)
+        if (point.x <= CGRectGetMidX(self.startSliderButton.frame) + (self.requireSegments ? self.segmentWidth : 0))
         {
-            point.x = CGRectGetMidX(self.startSliderButton.frame) + self.segmentWidth;
+            point.x = CGRectGetMidX(self.startSliderButton.frame) + (self.requireSegments ? self.segmentWidth : 0);
         }
-        else if ([self sliderMidPointForPoint:point] >= CGRectGetMaxX(self.sliderBackgroundView.bounds))
+        else if ([self sliderMidPointForPoint:point.x] >= CGRectGetMaxX(self.sliderBackgroundView.bounds))
         {
             point.x = CGRectGetMaxX(self.sliderBackgroundView.bounds) + SLIDER_BUTTON_WIDTH / 2;
         }
@@ -400,14 +468,30 @@
 
 - (void)callScrollDelegate
 {
-    CGFloat minPercent = (CGRectGetMinX(self.startSliderButton.frame) / CGRectGetWidth(self.sliderBackgroundView.frame) * 100);
-    CGFloat maxPercent = (CGRectGetMinX(self.endSliderButton.frame) / CGRectGetWidth(self.sliderBackgroundView.frame) * 100);
-    if ([self.delegate respondsToSelector:@selector(sliderScrolling:withMinPercent:andMaxPercent:)])
+    // Call the delegate to set the label for min range and max range
+    if (self.requireSegments)
     {
-        [self.delegate sliderScrolling:self withMinPercent:minPercent andMaxPercent:maxPercent];
-        self.minRangeLabel.text = self.minRangeText;
-        self.maxRangeLabel.text = self.maxRangeText;
+        NSInteger minIndex = CGRectGetMinX(self.startSliderButton.frame) / self.segmentWidth;
+        NSInteger maxIndex = CGRectGetMinX(self.endSliderButton.frame) / self.segmentWidth;
+        
+        if ([self.delegate respondsToSelector:@selector(sliderScrolled:toMinIndex:andMaxIndex:)])
+        {
+            [self.delegate sliderScrolled:self toMinIndex:minIndex andMaxIndex:maxIndex];
+        }
     }
+    else
+    {
+        CGFloat minPercent = (CGRectGetMinX(self.startSliderButton.frame) / CGRectGetWidth(self.sliderBackgroundView.frame) * 100);
+        CGFloat maxPercent = (CGRectGetMinX(self.endSliderButton.frame) / CGRectGetWidth(self.sliderBackgroundView.frame) * 100);
+        
+        if ([self.delegate respondsToSelector:@selector(sliderScrolling:withMinPercent:andMaxPercent:)])
+        {
+            [self.delegate sliderScrolling:self withMinPercent:minPercent andMaxPercent:maxPercent];
+        }
+    }
+    
+    self.minRangeLabel.text = self.minRangeText;
+    self.maxRangeLabel.text = self.maxRangeText;
 }
 
 // Slide to nearest position
@@ -415,7 +499,7 @@
 {
     point = [self resetFrameOnBoundsCrossForPoint:point];
     
-    NSInteger nearestSegmentIndex = round((point.x - SLIDER_BUTTON_WIDTH / 2) / self.segmentWidth);
+    NSInteger nearestSegmentIndex = round([self sliderMidPointForPoint:point.x] / self.segmentWidth);
     [self sliderDidSlideForPoint:CGPointMake(SLIDER_BUTTON_WIDTH/2 + nearestSegmentIndex * self.segmentWidth, point.y)];
     
     NSInteger startIndex = CGRectGetMinX(self.startSliderButton.frame) / self.segmentWidth;
@@ -465,7 +549,7 @@
         startButtonMidPoint += self.sliderSepertorWidth;
     }
     
-    return (round(point.x) >= round(startButtonMidPoint) && point.x <= self.frame.size.width - SLIDER_BUTTON_WIDTH/2);
+    return (round(point.x) >= round(startButtonMidPoint) && point.x <= [self sliderMidPointForPoint:self.frame.size.width]);
 }
 
 #pragma mark - Update the segments color on scrolling slider
@@ -473,7 +557,7 @@
 {
     if ([self.startSliderButton isSelected])
     {
-        [self updateSegmentColorWithStartIndex:ceil((CGRectGetMidX(self.startSliderButton.frame) - SLIDER_BUTTON_WIDTH / 2) / self.segmentWidth) + 1 andEndIndex:ceil((CGRectGetMidX(self.endSliderButton.frame) - SLIDER_BUTTON_WIDTH / 2) / self.segmentWidth) + 1];
+        [self updateSegmentColorWithStartIndex:ceil([self sliderMidPointForPoint:CGRectGetMidX(self.startSliderButton.frame)] / self.segmentWidth) + 1 andEndIndex:ceil([self sliderMidPointForPoint:CGRectGetMidX(self.endSliderButton.frame)] / self.segmentWidth) + 1];
     }
     else if ([self.endSliderButton isSelected])
     {
@@ -527,9 +611,9 @@
 }
 
 #pragma mark - Calculation for slider frame
-- (CGFloat)sliderMidPointForPoint:(CGPoint)point
+- (CGFloat)sliderMidPointForPoint:(CGFloat)point
 {
-    return (point.x - SLIDER_BUTTON_WIDTH/2);
+    return (point - SLIDER_BUTTON_WIDTH/2);
 }
 
 - (CGFloat)getSliderViewWidth

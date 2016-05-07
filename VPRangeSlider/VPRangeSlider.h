@@ -34,10 +34,10 @@
 @protocol VPRangeSliderDelegate <NSObject>
 
 @optional
-// Called when the user is panning. Used to update the display label while moving the slider. minPercent and maxPercent represents the percentage the slider has covered. (Between 0% and 100%)
+// Called when the user is panning. Used to update the display label while moving the slider. minPercent and maxPercent represents the percentage the slider has covered. (Between 0% and 100%) - Called only for smooth slider. Not for segmented slider
 - (void)sliderScrolling:(VPRangeSlider *)slider withMinPercent:(CGFloat)minPercent andMaxPercent:(CGFloat)maxPercent;
 
-// Called after the segment reaches it's nearest point (In other words, when touch ends).
+// Called after the segment reaches it's nearest point (In other words, when touch ends). Called only for segmented slider. Not for smooth slider.
 - (void)sliderScrolled:(VPRangeSlider *)slider toMinIndex:(NSInteger)minIndex andMaxIndex:(NSInteger)maxIndex;
 
 @end
@@ -95,5 +95,12 @@
 
 // The delegate property
 @property (nonatomic, weak) id<VPRangeSliderDelegate> delegate;
+
+// Function to scroll the ends of range slider (segmented or unsegemented) to the desired location.
+// The startRange and endRange should be in percentage for scrolling (0 - 100)
+- (void)scrollStartSliderToStartRange:(CGFloat)startRange andEndRange:(CGFloat)endRange;
+
+// The start index should be less than the end index and should be separated by atleast "sliderSepertorWidth". If not, it won't have any effect.
+- (void)scrollStartSliderToIndex:(NSInteger)startIndex andEndIndex:(NSInteger)endIndex;
 
 @end

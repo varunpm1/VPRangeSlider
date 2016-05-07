@@ -45,6 +45,10 @@ NSString * const SliderValue [] = {
     self.segmentedRangeSliderView.rangeSliderForegroundColor = [UIColor greenColor];
     self.segmentedRangeSliderView.rangeSliderButtonImage = [UIImage imageNamed:@"slider"];
     [self.segmentedRangeSliderView setDelegate:self];
+    
+    // To scroll to specified location
+    [self.rangeSliderView scrollStartSliderToStartRange:40 andEndRange:75];
+    [self.segmentedRangeSliderView scrollStartSliderToIndex:2 andEndIndex:3];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -61,16 +65,8 @@ NSString * const SliderValue [] = {
 
 - (void)sliderScrolled:(VPRangeSlider *)slider toMinIndex:(NSInteger)minIndex andMaxIndex:(NSInteger)maxIndex
 {
-    if (slider == self.segmentedRangeSliderView)
-    {
-        self.segmentedRangeSliderView.minRangeText = SliderValue[minIndex];
-        self.segmentedRangeSliderView.maxRangeText = SliderValue[maxIndex];
-    }
-    else if (slider == self.rangeSliderView)
-    {
-        self.rangeSliderView.minRangeText = @"0";
-        self.rangeSliderView.maxRangeText = @"100";
-    }
+    self.segmentedRangeSliderView.minRangeText = SliderValue[minIndex];
+    self.segmentedRangeSliderView.maxRangeText = SliderValue[maxIndex];
 }
 
 @end

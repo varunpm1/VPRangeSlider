@@ -45,6 +45,18 @@ This delegate is called when the slider stops at any segmented index.
 5. Submit a pull request :D
 
 ## History
+Version 1.0.1
+
+Added the intitial preset value for slider to display the default value during
+initilization. Some minor bug fixes.
+
+
+Version 1.0.0
+
+Stable range slider for segmented and unsegemented view with necessart code cleaning
+and bug fixes.
+
+
 Version 0.1.0
 
 Basic slider with all the necessary functions like 2 way slider with/without 

@@ -1,6 +1,6 @@
 //
 //  VPRangeSlider.h
-//  Version 1.0.1
+//  Version 1.0.2
 //
 //  Created by Varun P M on 13/12/15.
 //
@@ -50,8 +50,11 @@
 // The number of points in slider (Including the extreme points).
 @property (nonatomic, assign) NSInteger numberOfSegments;
 
-// If the reuiqreSegments is set no NO, then this value should be set to define minimum distance between the range sliders. Default to 44.
+// If the requireSegments is set to NO, then this value should be set to define minimum distance between the range sliders. Default to 44.
 @property (nonatomic, assign) CGFloat sliderSepertorWidth;
+
+// If the requireSegments is set to YES, then this value should be set if slider button should overlap or not. Default to NO. ie., 1 segment space will be present between the sliders.
+@property (nonatomic, assign) BOOL shouldSliderButtonOverlap;
 
 // The image used for displaying slider buttons. By default not set. rangeSliderButtonColor will be used if not set
 @property (nonatomic, strong) UIImage *rangeSliderButtonImage;

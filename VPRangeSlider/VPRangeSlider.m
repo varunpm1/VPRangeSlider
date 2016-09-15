@@ -1,6 +1,6 @@
 //
 //  VPRangeSlider.m
-//  Version 1.0.1
+//  Version 1.0.2
 //
 //  Created by Varun P M on 13/12/15.
 //
@@ -149,6 +149,7 @@
 {
     self.requireSegments = NO;
     self.numberOfSegments = 2;
+    self.shouldSliderButtonOverlap = NO;
     
     self.rangeSliderBackgroundColor = [UIColor grayColor];
     self.rangeSliderForegroundColor = [UIColor greenColor];
@@ -442,9 +443,9 @@
 {
     if ([self.startSliderButton isSelected])
     {
-        if ([self sliderMidPointForPoint:point.x] >= CGRectGetMidX(self.endSliderButton.frame) - (self.requireSegments ? self.segmentWidth : 0))
+        if ([self sliderMidPointForPoint:point.x] >= CGRectGetMidX(self.endSliderButton.frame) - (self.requireSegments ? (self.shouldSliderButtonOverlap ? 0 : self.segmentWidth) : 0))
         {
-            point.x = CGRectGetMidX(self.endSliderButton.frame) - (self.requireSegments ? self.segmentWidth : 0);
+            point.x = CGRectGetMidX(self.endSliderButton.frame) - (self.requireSegments ? (self.shouldSliderButtonOverlap ? 0 : self.segmentWidth) : 0);
         }
         else if (point.x < 0)
         {
@@ -453,9 +454,9 @@
     }
     else if ([self.endSliderButton isSelected])
     {
-        if (point.x <= CGRectGetMidX(self.startSliderButton.frame) + (self.requireSegments ? self.segmentWidth : 0))
+        if (point.x <= CGRectGetMidX(self.startSliderButton.frame) + (self.requireSegments ? (self.shouldSliderButtonOverlap ? 0 : self.segmentWidth) : 0))
         {
-            point.x = CGRectGetMidX(self.startSliderButton.frame) + (self.requireSegments ? self.segmentWidth : 0);
+            point.x = CGRectGetMidX(self.startSliderButton.frame) + (self.requireSegments ? (self.shouldSliderButtonOverlap ? 0 : self.segmentWidth) : 0);
         }
         else if ([self sliderMidPointForPoint:point.x] >= CGRectGetMaxX(self.sliderBackgroundView.bounds))
         {
@@ -527,7 +528,7 @@
     CGFloat endButtonMidPoint = CGRectGetMidX(self.endSliderButton.frame);
     if (self.requireSegments)
     {
-        endButtonMidPoint -= self.segmentWidth;
+        endButtonMidPoint -= self.shouldSliderButtonOverlap ? 0 : self.segmentWidth;
     }
     else
     {
@@ -542,7 +543,7 @@
     CGFloat startButtonMidPoint = CGRectGetMidX(self.startSliderButton.frame);
     if (self.requireSegments)
     {
-        startButtonMidPoint += self.segmentWidth;
+        startButtonMidPoint += (self.shouldSliderButtonOverlap ? 0 : self.segmentWidth);
     }
     else
     {

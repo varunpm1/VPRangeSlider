@@ -41,6 +41,7 @@ NSString * const SliderValue [] = {
     self.segmentedRangeSliderView.numberOfSegments = 4;
     self.segmentedRangeSliderView.sliderSize = CGSizeMake(10, 10);
     self.segmentedRangeSliderView.segmentSize = CGSizeMake(10, 10);
+    self.segmentedRangeSliderView.shouldSliderButtonOverlap = YES;
     
     self.segmentedRangeSliderView.rangeSliderForegroundColor = [UIColor greenColor];
     self.segmentedRangeSliderView.rangeSliderButtonImage = [UIImage imageNamed:@"slider"];
